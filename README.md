@@ -1,5 +1,5 @@
 # K8s Deployment-Level1
-===============================================================================
+
 ### Description:
 The repo contains a set of ansible scripts to deploys a cluster in Google Kubernetes Engine(GKE) and perform the following tasks.
   1.  Created a GKE cluster with the name defined in the inventory file
