@@ -1,3 +1,4 @@
+# Ingress Resource file for production application
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
