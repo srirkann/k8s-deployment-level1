@@ -1,0 +1,54 @@
+###################################################################
+#   Author: Sriram Kannan (c). All rights reserved.
+####################################################################
+---
+ # The task is to deploy the guestbook application
+
+- name: "Converting the application template with right values and storing in files"
+  template:
+    src: "{{ item }}"
+    dest: "/home/automation/roles/deploy-application/files/"
+  with_fileglob:
+    - templates/*.yaml
+   
+- name: "Deploy the redis master deployment"
+  command: "kubectl apply -f /home/automation/roles/deploy-application/files/redis-master-deployment.yaml -n {{ item }}"
+  with_items:
+    - production
+    - staging
+
+- name: "Deploy the redis master service"
+  command: "kubectl apply -f /home/automation/roles/deploy-application/files/redis-master-service.yaml -n {{ item }}"
+  with_items:
+    - production
+    - staging
+
+- name: "Deploy the redis slave deployment"
+  command: "kubectl apply -f /home/automation/roles/deploy-application/files/redis-slave-deployment.yaml -n {{ item }}"
+  with_items:
+    - production
+    - staging
+
+- name: "Deploy the redis slave service"
+  command: "kubectl apply -f /home/automation/roles/deploy-application/files/redis-slave-service.yaml -n {{ item }}"
+  with_items:
+    - production
+    - staging
+
+- name: "Deploy the frontend deployment"
+  command: "kubectl apply -f /home/automation/roles/deploy-application/files/frontend-deployment.yaml -n {{ item }}"
+  with_items:
+    - production
+    - staging
+
+- name: "Deploy the frontend service"
+  command: "kubectl apply -f /home/automation/roles/deploy-application/files/frontend-service.yaml -n {{ item }}"
+  with_items:
+    - production
+    - staging
+
+- name: "Deploy ingress controller"
+  command: "{{ item }}"
+  with_items:
+     - "kubectl apply -f /home/automation/roles/deploy-application/files/staging-ingress.yaml -n staging"
+     - "kubectl apply -f /home/automation/roles/deploy-application/files/production-ingress.yaml -n production"

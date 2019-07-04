@@ -1,0 +1,8 @@
+---
+# Default values for the application deployments
+
+frontend_replicas: 1
+frontend_service_type: NodePort
+redis_master_replica: 1
+redis_slave_replica: 2
+

@@ -1,0 +1,47 @@
+###################################################################
+#   Author: Sriram Kannan (c). All rights reserved.
+####################################################################
+---
+ - name: "Create k8s Cluster"
+   gcp_container_cluster:
+      name: "{{ cluster_name }}"
+      initial_node_count: "{{ node_count_host }}"
+      master_auth:
+        username: "{{ master_auth_username }}"
+        password: "{{ master_auth_password }}"
+      node_config:
+        machine_type: "{{ machine_type }}"
+        disk_size_gb: "{{ instance_disk_space }}"
+      zone: "{{ zone }}"
+      project: "{{ project_name }}"
+      cluster_ipv4_cidr: "{{cidr_block}}"
+      auth_kind: serviceaccount
+      service_account_file: "{{service_account_file}}"
+      scopes:
+        - https://www.googleapis.com/auth/cloud-platform
+      state: present
+   register: cluster
+
+ - name: "Creating GKE Node Pool"
+   gcp_container_node_pool:
+      name: "{{ npname }}"
+      initial_node_count: "{{ np_initial_node_count }}"
+      cluster: "{{ cluster }}"
+      zone: "{{ zone }}"
+      project: "{{ project_name }}"
+      auth_kind: serviceaccount
+      service_account_file: "{{ service_account_file }}"
+      scopes:
+        - https://www.googleapis.com/auth/cloud-platform
+      state: present
+
+ - name: "Gather the cluster details"
+   set_fact:
+     k8s_endpoint: "{{ cluster.endpoint }}"
+     k8s_username: "{{ cluster.masterAuth.username }}"
+     k8s_password: "{{ cluster.masterAuth.password }}"
+
+ - name: Printing Facts
+   debug:
+     msg: "The facts are cluster endpoint: {{ k8s_endpoint }}, {{ k8s_username }}, {{ k8s_password }} "
+

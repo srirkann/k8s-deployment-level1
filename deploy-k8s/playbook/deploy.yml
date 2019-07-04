@@ -1,0 +1,65 @@
+###################################################################
+#   Author: Sriram Kannan (c). All rights reserved.
+####################################################################
+---
+- name: Create a k8s cluster in GCP
+  hosts: localhost
+  gather_facts: false
+#  connection: local
+  become: true
+
+  tasks:
+    - name: "1. Create k8s Cluster"
+      include_role:
+        name: ../roles/deploy-cluster 
+
+    - name: "1.1 Configure Kubectl"
+      command: "gcloud container clusters get-credentials {{ cluster_name }} --zone {{ zone }} --project {{ project_name }}"
+      register: k8s_configuration
+
+    - name: "2. Deploy NGINX as ingress controller"
+      include_role:
+        name: ../roles/deploy-nginx
+
+    - name: "3. Create Namespaces Production and Staging"
+      kubernetes:
+        api_endpoint: "{{ k8s_endpoint }}"
+        url_username: "{{ k8s_username }}"
+        url_password: "{{ k8s_password }}"
+        inline_data:
+          kind: Namespace
+          apiVersion: v1
+          metadata:
+            name: "{{ item }}"
+          labels:
+            label_env: "{{ item }}"
+            label_ver: latest
+        state: present
+      with_items:
+         - staging
+         - production 
+          
+    - name: "4. Deploy the Guest Application"
+      include_role:
+        name: ../roles/deploy-application
+
+    - name: "5. Create Horizontal Pod Autoscaler"
+      command: kubectl autoscale deployment frontend --cpu-percent=20 --min=1 --max=5 -n {{item}}
+      with_items:
+         - staging
+         - production
+
+  post_tasks:
+    - name: "Deployment Complete"
+      debug:
+        msg: 
+          - "The Ansible Deployment performed the following tasks"
+          - "   1. Created a GKE cluster with {{ cluster_name }} Name"
+          - "   2. Deployed NGINX as ingress controller"
+          - "   3. Created 2 Namespaces Production and Staging"
+          - "   4. Deployed guestbook application in the two namespaces(Production and Staging)"
+          - "   5. Configured ingress rule to access both the application"
+          - "   6. Created horizontal Pod Autoscaler for both the application"
+          - "The guestbook application can be accessible via the ingress External IP address"
+          - "  - Production: http://<Ingress IP >/production "
+          - "  - Staging:    http://<Ingress IP>/staging "

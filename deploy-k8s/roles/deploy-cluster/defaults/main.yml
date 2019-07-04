@@ -1,0 +1,9 @@
+###################################################################
+#   Author: Sriram Kannan (c). All rights reserved.
+####################################################################
+---
+# Defaults for the role
+
+master_auth_username: cluster_admin
+master_auth_password: my-secret-password
+instance_disk_space: 100

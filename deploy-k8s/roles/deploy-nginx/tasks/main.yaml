@@ -1,0 +1,22 @@
+###################################################################
+#   Author: Sriram Kannan (c). All rights reserved.
+####################################################################
+---
+- name: "Get the user name"
+  command: gcloud config get-value account
+  register: acc_username
+
+- name: "Check if the user is already an cluster-admin"
+  command: kubectl auth can-i create deployments --namespace=dev --as="{{acc_username.stdout}}"
+  ignore_errors: yes
+  register: user_admin_status
+
+- name: "Pre Task to initialise the cluster admin role"
+  command: kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user="{{acc_username.stdout}}"
+  when: user_admin_status.stdout == "no - no RBAC policy matched"
+  
+- name: "Pre Task to deploy mandatory task"
+  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml"
+
+- name: "Deploy NGINX as Ingress Controller"
+  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml"

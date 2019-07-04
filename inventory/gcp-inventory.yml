@@ -1,0 +1,16 @@
+---
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+
+  vars:
+      cluster_name: 'standard-k8s-cluster'
+      node_count_host: 2
+      machine_type: n1-standard-1
+      cidr_block: "10.0.0.0/16"
+      zone: us-central1-a
+      service_account_file: "/home/automation/inventory/kubernetes-244404-e161b191a0f7.json"
+      npname: gkeclus-pool
+      np_initial_node_count: 1
+      project_name: "kubernetes-244404"
