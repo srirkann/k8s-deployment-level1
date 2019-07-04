@@ -19,11 +19,12 @@ The following list of task to be done before you begin the deployment.
   3.  Navigate to IAM and create a new service account with "Owner" role for the project.
   4.  Create a service account key of type json, Store the key in the inventory directory.
   5.  Open the inventory file "gcp-inventory.yml" and update the below as per your desire
+      ```
        - Cluster Name: <As per your desire or leave as it is> 
        - node_count_host: <As per your desire or leave as it is>
        - service_account_file: <Fully path of the file download as a part of step 4> 
        - Project_Name: <project id of step 2>
-  
+      ```
 ### Steps to Deploy
 1. In order to start the deployment, Build a docker container from the dockerfile present in the repo with the following command
    ``` 
